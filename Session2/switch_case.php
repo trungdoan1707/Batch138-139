@@ -7,7 +7,7 @@
         echo 'So le Chia Het cho 3';
     } else {
         echo 'So Le khong chia het cho 3';
-}
+    }
 
     //Bai Tap 2: Kiem tra so co phai thang trong nam
     
