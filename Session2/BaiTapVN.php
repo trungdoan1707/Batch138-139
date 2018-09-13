@@ -16,6 +16,7 @@ and open the template in the editor.
         <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
         <meta charset=utf-8 />
         <script src="MyJS.js"></script>
+        
     </head>
     <body>
         <?php
@@ -31,16 +32,15 @@ and open the template in the editor.
         if (isset($_POST['submit'])) {
             //check name 
             if (empty($_POST['name'])) {
-                
+
                 $nameError = "* Chưa có thông tin này";
             } else {
                 $name = test_input($_POST["name"]); // check name only contains letters and whitespace
                 if (!preg_match("/^[a-zA-Z ]*$/", $name)) {
                     $nameError = "Không sử dụng ký tự đặc biệt";
                 }
-                
             }
-            
+
             //check email
             if (empty($_POST["email"])) {
                 $emailError = "* Chưa có thông tin này";
@@ -65,9 +65,15 @@ and open the template in the editor.
             if (empty($contact)) {
                 $inforError = '* Chưa có thông tin này';
             }
-            if (empty($_POST['pathImage'])) {
+            if (empty($_FILES['pathImage']['tmp_name']) > 0) {
                 $imageError = 'Chua Co Anh';
             }
+            $_FILES['pathImage']['tmp_name'];
+            $remote_img = $_FILES['pathImage']['tmp_name'];
+            
+            $img = imagecreatefromjpeg($remote_img);
+            $path = 'image/' .uniqid(). $_FILES['pathImage']['name'];
+            imagejpeg($img, $path);
         }
 
         function test_input($data) {
@@ -79,10 +85,10 @@ and open the template in the editor.
         ?>
         <div class="formDK">
             <h3 style="text-align: center">Form Dang Ky Thong Tin</h3>
-            <form name="LoginForm" action="#" method="post">
+            <form name="LoginForm" action="#" method="post" enctype="multipart/form-data">
 
                 <p>Ho Va Ten : 
-                    <span class="error" style="color: red"><?php echo $nameError;?></span>
+                    <span class="error" style="color: red"><?php echo $nameError; ?></span>
                     <input type ="text" name ="name" value="">
                 </p>
 
@@ -121,8 +127,7 @@ and open the template in the editor.
                 <p>Mo Ta Ban Than: 
                     <span class="error"><?php echo $inforError; ?></span>
                 </p>
-                <textarea name="message" rows="10" cols="35" val =null>
-                </textarea>
+                <textarea name="message" rows="10" cols="35" val =null></textarea>
 
                 <div style="border: 1px solid aqua; float: right; text-align: right; width: 160px; height: 120px">
                     <img id="blah" src="<?php echo $srcPath; ?>" name="Avatar" alt="your image" style="width: 135px; height: 80px"/>
