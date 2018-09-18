@@ -16,64 +16,84 @@ and open the template in the editor.
         <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
         <meta charset=utf-8 />
         <script src="MyJS.js"></script>
-        
+
     </head>
     <body>
         <?php
-        $nameError = "";
-        $emailError = '';
-        $passError = '';
-        $repassError = '';
-        $genderError = '';
-        $AddressError = '';
-        $inforError = '';
-        $imageError = '';
+        include './Controller/ConnectDB_PHP.php';
+        $nameError = $emailError = $passError = $repassError = $genderError = $AddressError = $inforError = $imageError = "";
         $srcPath = './image/if_avatar_1814089.png';
+        $name = $email = $password = $gender = $Address = $infor = $image = "";
+        $checkValidate = true;
         if (isset($_POST['submit'])) {
             //check name 
             if (empty($_POST['name'])) {
-
                 $nameError = "* Chưa có thông tin này";
+                $checkValidate = FALSE;
             } else {
-                $name = test_input($_POST["name"]); // check name only contains letters and whitespace
+                // check name only contains letters and whitespace
                 if (!preg_match("/^[a-zA-Z ]*$/", $name)) {
                     $nameError = "Không sử dụng ký tự đặc biệt";
+                    $checkValidate = FALSE;
+                } else {
+                    $name = test_input($_POST["name"]);
                 }
             }
 
             //check email
             if (empty($_POST["email"])) {
                 $emailError = "* Chưa có thông tin này";
+                $checkValidate = FALSE;
             } else {
                 $email = test_input($_POST["email"]);
             }
             //check password
             if (empty($_POST['password'])) {
                 $passError = '* Chưa có thông tin này';
+                $checkValidate = FALSE;
             } elseif (strlen($_POST['password']) <= 6) {
                 $passError = 'Mat Khau Phai Hon 6 ky tu';
+                $checkValidate = FALSE;
             } elseif ($_POST['password'] != $_POST['repassword']) {
                 $repassError = 'Mat Khau Nhap Lai Khong Dung';
+                $checkValidate = FALSE;
             }
+            $password = $_POST['password'];
             if (empty($_POST['gender'])) {
                 $genderError = '* Chưa có thông tin này';
+                $checkValidate = FALSE;
             }
             if (empty($_POST['adderss'])) {
                 $AddressError = '* Chưa có thông tin này';
+                $checkValidate = FALSE;
             }
-            $contact = trim($_POST['message']);
-            if (empty($contact)) {
+            $gender = $_POST['gender'];
+
+            if (empty($_POST['message'])) {
                 $inforError = '* Chưa có thông tin này';
+                $checkValidate = FALSE;
             }
+            $Address = $_POST['adderss'];
+            $infor = $_POST['message'];
             if (empty($_FILES['pathImage']['tmp_name']) > 0) {
                 $imageError = 'Chua Co Anh';
+                $checkValidate = FALSE;
             }
-            $_FILES['pathImage']['tmp_name'];
+
+
             $remote_img = $_FILES['pathImage']['tmp_name'];
-            
+
             $img = imagecreatefromjpeg($remote_img);
-            $path = 'image/' .uniqid(). $_FILES['pathImage']['name'];
+            $path = 'image/' . uniqid() . $_FILES['pathImage']['name'];
             imagejpeg($img, $path);
+        }
+
+        //connectDB va insert tai khoan
+        if ($checkValidate) {
+            $sqlString = "INSERT INTO `users`(`name`, `email`, `password`, `avatar`, `city`, `gender`, `description`)"
+                    . " VALUES ('$name', '$email', '$password', '$remote_img', '$Address', '$gender', '$infor') ";
+            mysqli_query($conn,$sqlString);
+            
         }
 
         function test_input($data) {
@@ -127,7 +147,7 @@ and open the template in the editor.
                 <p>Mo Ta Ban Than: 
                     <span class="error"><?php echo $inforError; ?></span>
                 </p>
-                <textarea name="message" rows="10" cols="35" val =null></textarea>
+                <textarea name="message" rows="10" cols="35"></textarea>
 
                 <div style="border: 1px solid aqua; float: right; text-align: right; width: 160px; height: 120px">
                     <img id="blah" src="<?php echo $srcPath; ?>" name="Avatar" alt="your image" style="width: 135px; height: 80px"/>
